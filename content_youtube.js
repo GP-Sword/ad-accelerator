@@ -1,14 +1,15 @@
 (function () {
     const skipButtonSelectors = [
-       // Original version
-       '.ytp-ad-skip-button',
-       '.ytp-ad-skip-button-modern',
-       '.ytp-skip-ad-button',
-       // Observed May 2024
-       '.ytp-skip-ad button',
-       '[id^="skip-ad"] button',
-       '[id^="skip-button"]',
+        // Original version
+        '.ytp-ad-skip-button',
+        '.ytp-ad-skip-button-modern',
+        '.ytp-skip-ad-button',
+        // Observed May 2024
+        '.ytp-skip-ad button',
+        '[id^="skip-ad"] button',
+        '[id^="skip-button"]',
     ];
+    const blockerPopup = document.querySelector("ytd-popup-container");
 
     // Checks for ads and manipulates the video or uses skip button if present
     function handleVideoAd() {
@@ -18,16 +19,23 @@
         if (video && adElement && adElement.children.length > 0) {
             const originalPlaybackRate = video.playbackRate;
             const originalMutedStatus = video.muted;
-            muteAndSpeedUp(video, 5.0)
-        // const skipButton = document.querySelector(skipButtonSelectors.join(', '));
-        // if (skipButton) {
-        //     skipButton.click();
-        //     console.log('Used Button to Skip Ad');
+            muteAndSpeedUp(video, 8.0)
+
+            const skipButton = document.querySelector(skipButtonSelectors.join(', '));
+            if (skipButton) {
+                skipButton.click();
+                // console.log('Used Button to Skip Ad');
+            }
+        }
+
+        // Check and remove ad blocker popup
+        if (blockerPopup) {
+            blockerPopup.remove();
         }
     }
 
     function getRandomDelay(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+        return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
     function muteAndSpeedUp(videoElement, playbackRate) {
