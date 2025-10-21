@@ -13,20 +13,26 @@
 
     // Checks for ads and manipulates the video or uses skip button if present
     function handleVideoAd() {
-        const video = document.querySelector('video');
-        const adElement = document.querySelector('.video-ads.ytp-ad-module');
-        // Skip button seems to be acessible at initialization, if its ever present        
-        if (video && adElement && adElement.children.length > 0) {
-            const originalPlaybackRate = video.playbackRate;
-            const originalMutedStatus = video.muted;
-            muteAndSpeedUp(video, 8.0)
+        const adContainer = document.querySelector('.ad-showing');
+        if (!adContainer) {
+            return; // No ad is showing, so we do nothing.
+        }
 
-            const skipButton = document.querySelector(skipButtonSelectors.join(', '));
-            if (skipButton) {
-                skipButton.click();
-                // console.log('Used Button to Skip Ad');
+        const adVideo = adContainer.querySelector('video'); 
+        if (adVideo && adVideo.duration) {
+            muteAndSpeedUp(adVideo, 8.0);
+            try {
+                adVideo.currentTime = adVideo.duration;
+            } catch (e) {
+                // Uncaught TypeError, doesn't really change anything.
             }
         }
+
+        // const skipButton = document.querySelector(skipButtonSelectors.join(', '));
+        // if (skipButton) {
+        //     skipButton.click();
+        //     // console.log('Used Button to Skip Ad');
+        // }
 
         // Check and remove ad blocker popup
         if (blockerPopup) {
