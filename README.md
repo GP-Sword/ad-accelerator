@@ -11,10 +11,6 @@ Supported Sites:
 ![](assets/images/youtube_logo.png)
 ![](assets/images/hulu_logo.png)
 
-Extension available at:
-
-&nbsp;&nbsp;&nbsp;&nbsp; [Chrome Webstore ](https://chromewebstore.google.com/detail/gpboiedfklodfhngobidfjecdpmccehg)
-
 
 ## Background
 Since YouTube and other sites have started taking an aggressive stance with Adblockers, this is a complimentary and alternative ways to get around advertisements.
@@ -23,12 +19,12 @@ Since YouTube and other sites have started taking an aggressive stance with Adbl
 
 This project is community supported and open sourced under an MIT License. PR's welcome!
 
-## Potential Ideas
+## Installation
+To install, follow these steps:
 
-Add Support for Twitch
-	
-Add Support for Vimeo
-	
-Add Support for Dailymotion
-	
-Add Support for Netflix
+1. Click the green "Clone or Download" button, then "Download ZIP"
+2. Unzip the downloaded file.
+3. Open Google Chrome and navigate to `chrome://extensions`.
+4. Enable "Developer mode" in the top right corner.
+5. Click on "Load unpacked" and select the unzipped folder containing the extension files.
+6. The extension will now be installed and ready to use.
