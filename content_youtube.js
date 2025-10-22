@@ -38,17 +38,33 @@
         }
     }
 
+    function checkAdEndScreen() {
+        // The Skip button is no longer clickable, but does appear at the end screen
+        const skipButton = document.querySelector(skipButtonSelectors.join(', '));
+
+        // Reload page at end screen
+        if (skipButton) {
+            skipButton.remove();
+            
+            window.location.reload();
+        }
+    }
+
     // Checks for ads and manipulates the video or uses skip button if present
     function handleVideoAd() {
         // Deal with ad blocker elements first
         checkAdBlockerPopup();
         checkEnforcementMessage();
-
+        
         const adContainer = document.querySelector('.ad-showing');
         if (!adContainer) {
             return; // No ad is showing, so we do nothing
         }
+        
+        // Check if is at end screen
+        checkAdEndScreen();
 
+        // Else, skip the ad
         const adVideo = adContainer.querySelector('video');
         if (adVideo && adVideo.duration) {
             muteAndSpeedUp(adVideo, 8.0);
@@ -57,13 +73,6 @@
             } catch (e) {
                 // Uncaught TypeError for ad duration, doesn't affect anything
             }
-        }
-
-        // The Skip button is no longer clickable
-        const skipButton = document.querySelector(skipButtonSelectors.join(', '));
-        if (skipButton) {
-            // There is a skip button at the ad end screen, speed up the timer
-            adContainer.playbackRate = 16.0;
         }
     }
 
