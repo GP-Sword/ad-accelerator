@@ -10,6 +10,28 @@
         '[id^="skip-button"]',
     ];
 
+    let lastUserInteractionTime = 0;
+    const handledVideos = new WeakSet(); 
+
+    function updateInteractionTime() {
+        lastUserInteractionTime = Date.now();
+    }
+
+    window.addEventListener('mousedown', updateInteractionTime, { capture: true });
+    window.addEventListener('keydown', updateInteractionTime, { capture: true });
+    window.addEventListener('touchstart', updateInteractionTime, { capture: true });
+
+    function clickPlayButton() {
+        const playButton = document.querySelector('.ytp-play-button');
+        if (playButton) {
+            playButton.click();
+        } else {
+            // Fallback: try standard DOM play if button not found
+            const video = document.querySelector('video');
+            if(video) video.play();
+        }
+    }
+
     function checkAdBlockerPopup() {
         // Adblocker popup container
         const blockerPopup = document.querySelector("ytd-popup-container");
@@ -50,11 +72,55 @@
         }
     }
 
+    function setupKeepAlive(videoElement) {
+        if (handledVideos.has(videoElement)) return;
+        handledVideos.add(videoElement);
+        let readyTime = Date.now();
+
+        function checkAndResume() {
+            // If ad playing, let ad logic deal with it
+            if (document.querySelector('.ad-showing')) return;
+
+            // 3-second start-up window
+            const now = Date.now();
+            const isStartupWindow = (now - readyTime) < 3000;
+
+            // Human interaction
+            const isHumanInteraction = (now - lastUserInteractionTime) < 500;
+
+            // Else
+            if (isStartupWindow && videoElement.paused && !isHumanInteraction) {
+                console.log("Extension: Video paused on load/startup. Unpausing.");
+                clickPlayButton();
+            }
+        }
+
+        // Check immediately (in case it loaded paused)
+        checkAndResume();
+        
+        // Check again after 1s (in case browser auto-paused it slightly later)
+        setTimeout(checkAndResume, 1000);
+
+        // Listen for pause events (e.g., auto-pause triggers)
+        videoElement.addEventListener('pause', checkAndResume);
+
+        // Reset the "Ready Time" if the video wasn't actually ready yet
+        videoElement.addEventListener('canplay', () => {
+            readyTime = Date.now();
+            setTimeout(checkAndResume, 1000); 
+        }, { once: true });
+    }
+
     // Checks for ads and manipulates the video or uses skip button if present
     function handleVideoAd() {
         // Deal with ad blocker elements first
         checkAdBlockerPopup();
         checkEnforcementMessage();
+
+        const mainVideo = document.querySelector('video');
+        if (mainVideo) {
+            setupKeepAlive(mainVideo);
+        }
         
         const adContainer = document.querySelector('.ad-showing');
         if (!adContainer) {
@@ -87,5 +153,6 @@
         const observer = new MutationObserver(handleVideoAd);
         observer.observe(document.body, { childList: true, subtree: true });
     }
-    initializeAdHandling()
+
+    initializeAdHandling();
 })();
